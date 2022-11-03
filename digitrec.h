@@ -14,6 +14,9 @@
 #define K_CONST 3
 #endif
 
+
+
+
 // Top function for digit recognition
 bit4 digitrec( digit input );
 
