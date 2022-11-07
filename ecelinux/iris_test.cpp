@@ -6,11 +6,11 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include <string>
 
 #include "iris.h"
-#include "typedefs.h"
 #include "timer.h"
+
+using namespace std;
 
 //------------------------------------------------------------------------
 // Helper function for hex to int conversion
@@ -50,9 +50,9 @@ int main()
   std::string line_feature;
   std::string line_label;
   std::ifstream myfeatures ("data_iris/testing_iris.dat");
-  std::ifstream mylabels ("data_iris/testing_iris_labels.dat");
+  // std::ifstream mylabels ("data_iris/testing_iris_labels.dat");
   
-  // HLS streams for communicating with the cordic block
+  // HLS streams for communicating with the iris block
   hls::stream<bit32_t> iris_in;
   hls::stream<bit32_t> iris_out;
   hls::stream<bit1_t>  train_flag;
@@ -61,8 +61,16 @@ int main()
   const int N = TEST_SIZE;
   
   // Arrays to store test data and expected results
-  feature_type inputs[N][NUM_FEATURES];
-  int   expecteds[N];
+  // feature_type inputs[N][NUM_FEATURES];
+  // int   expecteds[N];
+
+  feature_type inputs[N][NUM_FEATURES] = {
+    #include "data_iris/testing_iris.dat"
+  };
+
+  int expecteds[N] = {
+    #include "data_iris/testing_iris_labels.dat" 
+  };
 
   // Timer
   Timer train_timer("Iris Train FPGA");
@@ -73,31 +81,33 @@ int main()
   int num_test_insts = 0;
 
 
-  if ( myfile.is_open() ) {
+  if ( outfile.is_open() ) {
 
     //-------------------------------------------------------------------------------
     // Read data from the input files into test feature array and test label array
     //-------------------------------------------------------------------------------
-    for (int i = 0; i < N; ++i) {
-      assert( std::getline( myfeatures, line_feature) );
-      assert( std::getline( mylabels, line_label) );
+    // for (int i = 0; i < N; ++i) {
+      // assert( std::getline( myfeatures, line_feature) );
+      // assert( std::getline( mylabels, line_label) );
 
       // Read feature input
 
-      start_pos = 0;
-      for(int f = 0; f < NUM_FEATURES; f++) { //Splits feature string into 4 float values, based on comma positions
-        int comma_pos = line_feature.find(",", start_pos);
-        inputs[i][f] = float2feature_type(stof(line_feature.substr(start_pos, comma_pos-start_pos))); //TODO: ADD feature type conversion
-        start_pos = comma_pos+1;
-      }
+      // int start_pos = 0;
+      // for(int f = 0; f < NUM_FEATURES; f++) { //Splits feature string into 4 float values, based on comma positions
+      //   int comma_pos = line_feature.find(",", start_pos);
+      //   inputs[i][f] = float2feature_type(stof(line_feature.substr(start_pos, comma_pos-start_pos))); //TODO: ADD feature type conversion
+      //   start_pos = comma_pos+1;
+      // }
       
       //Read test input
-      expecteds[i] = stoi(line_label.substr(0,1)); //Ignores comma character
+      // expecteds[i] = stoi(line_label.substr(0,1)); //Ignores comma character
+      // expecteds[i] = strt(line_label.substr(0,1)); //Ignores comma character
+
 
       // Store the digits into arrays
       // inputs[i] = input_digit;
 
-    }
+    // }
 
     //-------------------------------------------------------------------------------
     // Training Model
@@ -106,10 +116,10 @@ int main()
     train_flag.write( 1 );
 
     train_timer.start();
-    dut( iris_in, iris_out );
-    train_timer.stop()
+    dut( iris_in, iris_out, train_flag );
+    train_timer.stop();
 
-    bit1_t train_done = train_flag.read();
+    bit32_t train_done = iris_out.read();
 
     if (train_done != 1){
       std::cout << " Training Finish Signal Not Received "<< std::endl;
@@ -123,7 +133,7 @@ int main()
     //--------------------------------------------------------------------
     for (int i = 0; i < N; ++i ) {
       // Read input from array and split into two 32-bit words
-      for(int f = 0; f < NUM_FEATURES; f++){
+      for(int f = 0; f < 4; f++){
         feature_type input_f = inputs[i][f];
         //Write float to device
         iris_in.write( input_f );
@@ -137,10 +147,11 @@ int main()
     //--------------------------------------------------------------------
     for (int i = 0; i < N; ++i ) {
       // Call design under test (DUT)
-      dut( iris_in, iris_out );
+      dut( iris_in, iris_out, train_flag );
 
       // Read result
-      bit2_t interpreted_iris = digitrec_out.read();
+      bit2_t interpreted_iris = iris_out.read();
+      printf("Num iris %d, expect %d, predict %d\n", i, (int)expecteds[i], (int)interpreted_iris);
 
       num_test_insts++;
       
@@ -163,11 +174,10 @@ int main()
             << "%" << std::endl;
     
     // Close input file for the testing set
-    myfile.close();
+    outfile.close();
     
   }
-  else
-      std::cout << "Unable to open file for the testing set!" << std::endl; 
+  else std::cout << "Unable to open file for the testing set!" << std::endl; 
   
   // Close output file
   outfile.close();

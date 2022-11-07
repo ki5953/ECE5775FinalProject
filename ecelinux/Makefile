@@ -12,7 +12,7 @@
 VHLS_PATH := $(dir $(shell which vivado_hls))/..
 VHLS_INC ?= ${VHLS_PATH}/include
 
-CFLAGS = -g -I${VHLS_INC} 
+CFLAGS = -g -I${VHLS_INC} -std=c++11
 
 all: csim
 

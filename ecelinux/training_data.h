@@ -14,17 +14,16 @@
 #define TRAIN_SIZE 90
 #define TEST_SIZE 60
 
+#define NUM_LABELS 3
+#define NUM_FEATURES 4
 
-const feature_type iris_trn[TRAIN_SIZE][NUM_FEATURES] = {
-    {
+
+const feature_type iris_trn[TRAIN_SIZE][4] = {
     #include "data_iris/training_iris.dat" 
-    },
 };
 
 const bit2_t trn_label[TRAIN_SIZE] = {
-    {
     #include "data_iris/training_iris_labels.dat" 
-    },
 };
 
 // const feature_type testing_data[TEST_SIZE] = {

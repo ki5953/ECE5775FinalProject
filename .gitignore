@@ -1,0 +1,9 @@
+build
+*.prj
+result
+*.log
+cordic_tutorial
+zedboard_project
+*.bit
+*.tgz
+*.zip
