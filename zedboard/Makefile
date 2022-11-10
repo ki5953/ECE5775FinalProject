@@ -9,22 +9,22 @@
 
 
 INC_PATH=/usr/include/vivado_hls
-CFLAGS = -I${INC_PATH}
+CFLAGS = -I${INC_PATH} -DHLS_NO_XIL_FPO_LIB
 
 all: sw
 
-sw: digitrec.cpp digitrec_test.cpp
+sw: iris.cpp iris_test.cpp
 	@echo "Compiling & executing digitrec software program on ARM ..."
-	g++ ${CFLAGS} digitrec.cpp digitrec_test.cpp -o digitrec-arm
-	./digitrec-arm
+	g++ ${CFLAGS} iris.cpp iris_test.cpp -o iris-arm -lrt
+	./iris-arm
 
 fpga: host.cpp
 	@echo "Compiling host program & running digitrec accelerator ..."
-	g++ ${CFLAGS} host.cpp -o digitrec-fpga
-	./digitrec-fpga
+	g++ ${CFLAGS} host.cpp -o iris-fpga -lrt
+	./iris-fpga
 
 # Clean up the directory before submission
 clean:
 	@echo "Clean up output files"
-	rm -rf digitrec-sw vivado_hls.log *.prj result out.dat *~
-	rm -rf digitrec-fpga
+	rm -rf iris-sw vivado_hls.log *.prj result out.dat *~
+	rm -rf iris-fpga

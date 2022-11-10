@@ -18,7 +18,7 @@ float prior[NUM_LABELS];
 void dut(
     hls::stream<bit32_t> &strm_in,
     hls::stream<bit32_t> &strm_out,
-    hls::stream<bit1_t>  &strm_train
+    hls::stream<bit8_t>  &strm_train
 )
 {
 
@@ -26,7 +26,7 @@ void dut(
   bit2_t       voted_iris;
 
   //Decide if training
-  bit1_t train = strm_train.read();
+  bit8_t train = strm_train.read();
   if (train){
     gnb_train(iris_trn, trn_label);
     strm_out.write( 1 );

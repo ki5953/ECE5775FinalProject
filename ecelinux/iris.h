@@ -17,7 +17,7 @@
 void dut(
     hls::stream<bit32_t> &strm_in,
     hls::stream<bit32_t> &strm_out,
-    hls::stream<bit1_t>  &strm_train
+    hls::stream<bit8_t>  &strm_train
 );
 
 // GNB Training function, given input feature map

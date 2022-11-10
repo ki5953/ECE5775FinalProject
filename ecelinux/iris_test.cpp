@@ -55,7 +55,7 @@ int main()
   // HLS streams for communicating with the iris block
   hls::stream<bit32_t> iris_in;
   hls::stream<bit32_t> iris_out;
-  hls::stream<bit1_t>  train_flag;
+  hls::stream<bit8_t>  train_flag;
 
   // Number of test instances
   const int N = TEST_SIZE;

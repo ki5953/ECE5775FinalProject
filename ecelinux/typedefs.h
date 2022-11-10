@@ -14,10 +14,10 @@
 #define TOT_WIDTH DEC_BITS+3
 #endif
 
-typedef ap_uint<1> bit1_t;
 typedef ap_uint<2> bit2_t;
 typedef ap_uint<4> bit4_t;
 typedef ap_uint<6> bit6_t;
+typedef ap_uint<8> bit8_t;
 typedef ap_uint<32> bit32_t;
 typedef ap_uint<64> bit64_t;
 

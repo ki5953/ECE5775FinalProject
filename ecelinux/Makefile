@@ -17,7 +17,7 @@ CFLAGS = -g -I${VHLS_INC} -std=c++11
 all: csim
 
 csim: iris.cpp iris_test.cpp
-	@echo "Compiling & simulating digitrec on amdpool ..."
+	@echo "Compiling & simulating iris on amdpool ..."
 	g++ ${CFLAGS} $^ -o iris -lrt
 	./iris
 
@@ -28,14 +28,14 @@ float_vivado:
 	vivado_hls -f run_float.tcl
 
 float_bitstream: 
-	@echo "Synthesizing digitrec and creating bitstream on amdpool ..."
+	@echo "Synthesizing iris and creating bitstream on amdpool ..."
 	vivado_hls -f run_float.tcl
-	./run_bitstream.sh iris_float.prj
+	./run_bitstream.sh iris_float
 
 fixed_bitstream: 
-	@echo "Synthesizing digitrec and creating bitstream on amdpool ..."
+	@echo "Synthesizing iris and creating bitstream on amdpool ..."
 	vivado_hls -f run_fixed.tcl
-	./run_bitstream.sh iris_fixed_2decbits.prj
+	./run_bitstream.sh iris_fixed_2decbits
 
 clean:
 	rm -rf iris *.dat *.prj *.log
