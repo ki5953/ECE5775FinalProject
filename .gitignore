@@ -3,7 +3,7 @@ build
 result
 *.log
 cordic_tutorial
-zedboard_project
+*ecelinux/zedboard_project
 *.bit
 *.tgz
 *.zip
