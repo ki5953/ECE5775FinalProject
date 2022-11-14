@@ -34,10 +34,10 @@ int main(int argc, char** argv)
   // These channels appear as files to the Linux OS
   int fdr = open("/dev/xillybus_read_32", O_RDONLY);  // Iris out
   int fdw = open("/dev/xillybus_write_32", O_WRONLY); // Iris in
-  int fdtw = open("/dev/xillybus_write_8", O_WRONLY); // Train flag
+  // int fdtw = open("/dev/xillybus_write_8", O_WRONLY); // Train flag
 
   // Check that the channels are correctly opened
-  if ((fdr < 0) || (fdw < 0) || (fdtw < 0)) {
+  if ((fdr < 0) || (fdw < 0)) {
     fprintf (stderr, "Failed to open Xillybus device channels\n");
     exit(-1);
   }
@@ -76,8 +76,12 @@ int main(int argc, char** argv)
 
   train_timer.start();
 
-  bit8_t train_flag = 1;
-  nbytes = write (fdtw, (void*)&train_flag, sizeof(train_flag)); // Write Train flag to 1
+  // bit8_t train_flag = 1;
+  // nbytes = write (fdtw, (void*)&train_flag, sizeof(train_flag)); // Write Train flag to 1
+  // assert (nbytes == sizeof(train_flag));
+
+  int32_t train_flag = 0;
+  nbytes = write (fdw, (void*)&train_flag, sizeof(train_flag)); // Write Train flag to 1
   assert (nbytes == sizeof(train_flag));
 
   bit32_t train_done;

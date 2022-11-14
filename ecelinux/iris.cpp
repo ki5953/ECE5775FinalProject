@@ -17,17 +17,14 @@ float prior[NUM_LABELS];
 
 void dut(
     hls::stream<bit32_t> &strm_in,
-    hls::stream<bit32_t> &strm_out,
-    hls::stream<bit8_t>  &strm_train
+    hls::stream<bit32_t> &strm_out
 )
 {
 
   feature_type test_iris[NUM_FEATURES];
-  bit2_t       voted_iris;
-
   //Decide if training
-  bit8_t train = strm_train.read();
-  if (train){
+  feature_type input = strm_in.read();
+  if (input == 0){
     gnb_train(iris_trn, trn_label);
     strm_out.write( 1 );
   } else {
@@ -35,7 +32,7 @@ void dut(
     // Input processing
     // ------------------------------------------------------
     // Read the two input 32-bit words (low word first)
-    feature_type input1 = strm_in.read();
+    feature_type input1 = input;
     feature_type input2 = strm_in.read();
     feature_type input3 = strm_in.read();
     feature_type input4 = strm_in.read();
@@ -52,13 +49,13 @@ void dut(
     // ------------------------------------------------------
     // Call IRIS
     // ------------------------------------------------------
-    voted_iris = gnb_predict( test_iris );
+    bit2_t prediction = gnb_predict (test_iris);
 
     // ------------------------------------------------------
     // Output processing
     // ------------------------------------------------------
     // Write out the voted digit value (low word first)
-    strm_out.write( voted_iris );
+    strm_out.write( prediction );
   }
 }
 
@@ -131,7 +128,6 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
         }
       }
     }
-  // TODO Can move divides out here?
 
     //Accrue Std dev
     // for sample in range(X.shape[0]):
@@ -141,13 +137,13 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
         // Check each standard deviation
         // print(y[sample])
         if(labels[i] == output_labels[0]){
-          std_dev[0][j] += pow((features[i][j]-mean[0][j]), 2) / m1_c;
+          std_dev[0][j] += (features[i][j]-mean[0][j])*(features[i][j]-mean[0][j]) / m1_c;
         }
         else if(labels[i] == output_labels[1]){
-          std_dev[1][j] += pow((features[i][j]-mean[1][j]), 2) / m2_c;
+          std_dev[1][j] += (features[i][j]-mean[1][j])*(features[i][j]-mean[1][j]) / m2_c;
         }
         else if(labels[i] == output_labels[2]){
-          std_dev[2][j] += pow((features[i][j]-mean[2][j]), 2) / m3_c;
+          std_dev[2][j] += (features[i][j]-mean[2][j])*(features[i][j]-mean[2][j]) / m3_c;
         }
       }
     }
@@ -171,15 +167,30 @@ bit2_t gnb_predict( feature_type X[4] ){
   bit2_t prediction = 3;
   float labelprob = 0;
   
-  for(int i = 0; i < NUM_LABELS; i++){
+  PREDICT_LOOP: for(int i = 0; i < NUM_LABELS; i++){
     float gnb_prior = prior[i];
+    //float smooth = 1.0;
     for(int j = 0; j < NUM_FEATURES; j++){
                                           
-      float std = std_dev[i][j];   
-      float first_term = 1 / sqrt(2*M_PI*(pow(std, 2)));
+      float std = std_dev[i][j];
+      float std_2_2 = (std)*(std)*2;
+      float first_term = sqrt(3.14159265358979*std_2_2); 
       float mn = mean[i][j];
-      float exp_term = exp(-(pow((X[j]-mn),2)/(2*pow(std,2))));
-      gnb_prior *= first_term*exp_term;
+      float exp_term = exp( -( (X[j]-mn)*(X[j]-mn) / std_2_2 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
+      // float base_x = -( (X[j]-mn)*(X[j]-mn) / std_2_2 );
+      // float exp_term_2;
+      // float clamp_val = 1.263 * sqrt(std);
+      // if (base_x > clamp_val || base_x < -clamp_val) exp_term_2 = 0; //clamping
+      // else {
+      //   float x_2 = base_x * base_x;
+      //   float x_3 = x_2 * base_x;
+      //   float x_4 = x_3 * base_x;
+      //   exp_term_2 = 1 + base_x + x_2/2 + x_3/6 + x_4/24;
+      // }
+
+      // printf("OG Exp Term: %f, New Exp: %f\n", exp_term, exp_term_2);
+      gnb_prior *= (exp_term) / (first_term);
+      
     }
     if(gnb_prior > labelprob){
       prediction = i;

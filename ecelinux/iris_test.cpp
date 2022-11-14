@@ -55,7 +55,7 @@ int main()
   // HLS streams for communicating with the iris block
   hls::stream<bit32_t> iris_in;
   hls::stream<bit32_t> iris_out;
-  hls::stream<bit8_t>  train_flag;
+  //hls::stream<bit8_t>  train_flag;
 
   // Number of test instances
   const int N = TEST_SIZE;
@@ -113,10 +113,10 @@ int main()
     // Training Model
     //-------------------------------------------------------------------------------
     //Train model on training data
-    train_flag.write( 1 );
+    iris_in.write( 0 );
 
     train_timer.start();
-    dut( iris_in, iris_out, train_flag );
+    dut( iris_in, iris_out );
     train_timer.stop();
 
     bit32_t train_done = iris_out.read();
@@ -138,7 +138,6 @@ int main()
         //Write float to device
         iris_in.write( input_f );
       }
-      train_flag.write( 0 );
     }
 
     
@@ -147,7 +146,7 @@ int main()
     //--------------------------------------------------------------------
     for (int i = 0; i < N; ++i ) {
       // Call design under test (DUT)
-      dut( iris_in, iris_out, train_flag );
+      dut( iris_in, iris_out );
 
       // Read result
       bit2_t interpreted_iris = iris_out.read();

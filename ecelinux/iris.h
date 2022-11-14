@@ -16,8 +16,7 @@
 // Top function for synthesis
 void dut(
     hls::stream<bit32_t> &strm_in,
-    hls::stream<bit32_t> &strm_out,
-    hls::stream<bit8_t>  &strm_train
+    hls::stream<bit32_t> &strm_out
 );
 
 // GNB Training function, given input feature map
