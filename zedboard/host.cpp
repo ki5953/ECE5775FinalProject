@@ -107,10 +107,12 @@ int main(int argc, char** argv)
       feature_type feature = inputs[i][j];
       // bit32_t feature_i;
       // feature_i(feature.length()-1,0) = feature(feature.length()-1,0);
-      // int32_t input = feature_i;
+      union FeatureUnion input;
+      input.fval = feature;
       // Write words to the device
-      nbytes = write(fdw, (void*)&feature, sizeof(feature));
-      assert (nbytes == sizeof(feature));
+      
+      nbytes = write(fdw, (void*)&input.ival, sizeof(input.ival));
+      assert (nbytes == sizeof(input.ival));
     }
   }
 

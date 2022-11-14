@@ -21,9 +21,9 @@ void dut(
 )
 {
 
-  feature_type test_iris[NUM_FEATURES];
+  float test_iris[NUM_FEATURES];
   //Decide if training
-  feature_type input = strm_in.read();
+  bit32_t input = strm_in.read();
   if (input == 0){
     gnb_train(iris_trn, trn_label);
     strm_out.write( 1 );
@@ -32,15 +32,49 @@ void dut(
     // Input processing
     // ------------------------------------------------------
     // Read the two input 32-bit words (low word first)
-    feature_type input1 = input;
-    feature_type input2 = strm_in.read();
-    feature_type input3 = strm_in.read();
-    feature_type input4 = strm_in.read();
 
-    test_iris[0] = input1;
-    test_iris[1] = input2;
-    test_iris[2] = input3;
-    test_iris[3] = input4;
+    // feature_type input1 = static_cast<float> (input);
+    // input = strm_in.read();
+    // feature_type input2 = static_cast<float> (input);
+    // input = strm_in.read();
+    // feature_type input3 = static_cast<float> (input);
+    // input = strm_in.read();
+    // feature_type input4 = static_cast<float> (input);
+
+    // std::memcpy(&input1, &input, sizeof input1);
+    // input = strm_in.read();
+    // std::memcpy(&input2, &input, sizeof input2);
+    // input = strm_in.read();
+    // std::memcpy(&input3, &input, sizeof input3);
+    // input = strm_in.read();
+    // std::memcpy(&input4, &input, sizeof input4);
+
+    union FeatureUnion input1;
+    union FeatureUnion input2;
+    union FeatureUnion input3;
+    union FeatureUnion input4;
+
+    input1.ival = input;
+    input2.ival = strm_in.read();
+    input3.ival = strm_in.read();
+    input4.ival = strm_in.read();
+
+    // printf("inputs:");
+    // printf(" %d", input1.ival);
+    // printf(" %d", input2.ival);
+    // printf(" %d", input3.ival);
+    // printf(" %d\n", input4.ival);
+    
+    test_iris[0] = input1.fval;
+    test_iris[1] = input2.fval;
+    test_iris[2] = input3.fval;
+    test_iris[3] = input4.fval;
+
+    // printf("test iris:");
+    // printf(" %f", test_iris[0]);
+    // printf(" %f", test_iris[1]);
+    // printf(" %f", test_iris[2]);
+    // printf(" %f\n", test_iris[3]);
 
     // Convert input raw bits to fixed-point representation via bit slicing
     // test_digit(31, 0) = input_lo;

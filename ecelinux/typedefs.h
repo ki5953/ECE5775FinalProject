@@ -8,6 +8,7 @@
 
 #include "ap_int.h"
 #include "ap_fixed.h"
+#include <stdint.h>
 
 #ifndef DEC_BITS
 #define DEC_BITS 2 // Number of decimal bits for fixed point representation
@@ -23,8 +24,12 @@ typedef ap_uint<64> bit64_t;
 
 #ifdef FIXED_TYPE // Fixed-point settings
 typedef ap_ufixed<TOT_WIDTH, 3> feature_type;
+extern "C" { union FeatureUnion {ap_ufixed<TOT_WIDTH, 3> fval; int32_t ival;}; }
 #else // Floating-point settings
+extern "C" { union FeatureUnion {float fval; int32_t ival;}; }
 typedef float feature_type;
 #endif
+
+
 
 #endif

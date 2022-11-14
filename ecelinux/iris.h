@@ -6,7 +6,7 @@
 #ifndef IRIS_H
 #define IRIS_H
 
-#include<hls_stream.h>
+#include <hls_stream.h>
 
 #include "typedefs.h"
 #include "training_data.h"

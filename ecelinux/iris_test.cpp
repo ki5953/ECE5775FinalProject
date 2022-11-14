@@ -134,9 +134,10 @@ int main()
     for (int i = 0; i < N; ++i ) {
       // Read input from array and split into two 32-bit words
       for(int f = 0; f < 4; f++){
-        feature_type input_f = inputs[i][f];
+        union FeatureUnion input_f;
+        input_f.fval = inputs[i][f];
         //Write float to device
-        iris_in.write( input_f );
+        iris_in.write( input_f.ival );
       }
     }
 
