@@ -8,6 +8,8 @@
 #define mymax(a, b) ((a>=b)?a:b)
 #define mymin(a, b) ((a<b)?a:b)
 
+#define ABS(a) ((a < 0)? -a:a)
+
 #define SQRT(n) ()
 
 using namespace std;
@@ -211,7 +213,7 @@ bit2_t gnb_predict( feature_type X[4] ){
       float x = X[j];
       // float exp_term = exp( -( (x-mn)*(x-mn)*std2*0.5 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
       // gnb_prior *= (exp_term) * (first_term);
-      float yval = slope[i][j] * abs(mn-x) + yint[i][j];
+      float yval = slope[i][j] * ABS(mn-x) + yint[i][j];
       if (yval > 0){
         gnb_prior *= yval;
       } else {
