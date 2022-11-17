@@ -141,13 +141,13 @@ int main()
       }
     }
 
-    
+    // Call design under test (DUT)
+    dut( iris_in, iris_out );
+
     //--------------------------------------------------------------------
     // Execute the iris sim and receive data
     //--------------------------------------------------------------------
     for (int i = 0; i < N; ++i ) {
-      // Call design under test (DUT)
-      dut( iris_in, iris_out );
 
       // Read result
       bit2_t interpreted_iris = iris_out.read();
@@ -175,6 +175,8 @@ int main()
     
     // Close input file for the testing set
     outfile.close();
+    // delete &train_timer;
+    // delete &test_timer;
     
   }
   else std::cout << "Unable to open file for the testing set!" << std::endl; 

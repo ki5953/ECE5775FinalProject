@@ -30,7 +30,7 @@ float_vivado:
 float_bitstream: 
 	@echo "Synthesizing iris and creating bitstream on amdpool ..."
 	vivado_hls -f run_float.tcl
-	./run_bitstream.sh iris_float
+	./run_bitstream.sh iris_float_nopragma
 
 fixed_bitstream: 
 	@echo "Synthesizing iris and creating bitstream on amdpool ..."

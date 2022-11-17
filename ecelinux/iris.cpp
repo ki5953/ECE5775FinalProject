@@ -5,6 +5,11 @@
 
 #include "iris.h"
 
+#define mymax(a, b) ((a>=b)?a:b)
+#define mymin(a, b) ((a<b)?a:b)
+
+#define SQRT(n) ()
+
 using namespace std;
 
 float mean[NUM_LABELS][NUM_FEATURES];
@@ -21,7 +26,7 @@ void dut(
 )
 {
 
-  float test_iris[NUM_FEATURES];
+  float test_iris[TEST_SIZE][NUM_FEATURES];
   //Decide if training
   bit32_t input = strm_in.read();
   if (input == 0){
@@ -32,64 +37,36 @@ void dut(
     // Input processing
     // ------------------------------------------------------
     // Read the two input 32-bit words (low word first)
-
-    // feature_type input1 = static_cast<float> (input);
-    // input = strm_in.read();
-    // feature_type input2 = static_cast<float> (input);
-    // input = strm_in.read();
-    // feature_type input3 = static_cast<float> (input);
-    // input = strm_in.read();
-    // feature_type input4 = static_cast<float> (input);
-
-    // std::memcpy(&input1, &input, sizeof input1);
-    // input = strm_in.read();
-    // std::memcpy(&input2, &input, sizeof input2);
-    // input = strm_in.read();
-    // std::memcpy(&input3, &input, sizeof input3);
-    // input = strm_in.read();
-    // std::memcpy(&input4, &input, sizeof input4);
-
+    
     union FeatureUnion input1;
     union FeatureUnion input2;
     union FeatureUnion input3;
     union FeatureUnion input4;
 
-    input1.ival = input;
-    input2.ival = strm_in.read();
-    input3.ival = strm_in.read();
-    input4.ival = strm_in.read();
+    TEST_LOOP: for(int i = 0; i < TEST_SIZE; i++){
 
-    // printf("inputs:");
-    // printf(" %d", input1.ival);
-    // printf(" %d", input2.ival);
-    // printf(" %d", input3.ival);
-    // printf(" %d\n", input4.ival);
-    
-    test_iris[0] = input1.fval;
-    test_iris[1] = input2.fval;
-    test_iris[2] = input3.fval;
-    test_iris[3] = input4.fval;
+      input1.ival = (i == 0) ? input : strm_in.read();
+      input2.ival = strm_in.read();
+      input3.ival = strm_in.read();
+      input4.ival = strm_in.read();
+      
+      test_iris[i][0] = input1.fval;
+      test_iris[i][1] = input2.fval;
+      test_iris[i][2] = input3.fval;
+      test_iris[i][3] = input4.fval;
 
-    // printf("test iris:");
-    // printf(" %f", test_iris[0]);
-    // printf(" %f", test_iris[1]);
-    // printf(" %f", test_iris[2]);
-    // printf(" %f\n", test_iris[3]);
+      // ------------------------------------------------------
+      // Call IRIS
+      // ------------------------------------------------------
+      bit2_t prediction = gnb_predict (test_iris[i]);
+      
+      // ------------------------------------------------------
+      // Output processing
+      // ------------------------------------------------------
+      // Write out the voted digit value (low word first)
+      strm_out.write( prediction );
 
-    // Convert input raw bits to fixed-point representation via bit slicing
-    // test_digit(31, 0) = input_lo;
-    // test_digit(test_digit.length()-1, 32) = input_hi;
-
-    // ------------------------------------------------------
-    // Call IRIS
-    // ------------------------------------------------------
-    bit2_t prediction = gnb_predict (test_iris);
-
-    // ------------------------------------------------------
-    // Output processing
-    // ------------------------------------------------------
-    // Write out the voted digit value (low word first)
-    strm_out.write( prediction );
+    } //End test for loop
   }
 }
 
@@ -210,7 +187,8 @@ bit2_t gnb_predict( feature_type X[4] ){
       float std_2_2 = (std)*(std)*2;
       float first_term = sqrt(3.14159265358979*std_2_2); 
       float mn = mean[i][j];
-      float exp_term = exp( -( (X[j]-mn)*(X[j]-mn) / std_2_2 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
+      float x = X[j];
+      float exp_term = exp( -( (x-mn)*(x-mn) / std_2_2 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
       // float base_x = -( (X[j]-mn)*(X[j]-mn) / std_2_2 );
       // float exp_term_2;
       // float clamp_val = 1.263 * sqrt(std);
