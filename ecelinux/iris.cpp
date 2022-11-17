@@ -131,7 +131,6 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
       for (int j = 0; j < NUM_FEATURES; j++){
         //Check to see what the label is for this attribute, and add to corresponding index of mean array
         //Need to accrue means for each attribute, for each type of flower.
-        //print(y[sample])
         if(labels[i] == output_labels[0]){
           mean[0][j] += features[i][j] / m1_c;
         }
@@ -150,7 +149,6 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
     for (int i = 0; i < TRAIN_SIZE; i++){
       for (int j = 0; j < NUM_FEATURES; j++){
         // Check each standard deviation
-        // print(y[sample])
         if(labels[i] == output_labels[0]){
           std_dev[0][j] += (features[i][j]-mean[0][j])*(features[i][j]-mean[0][j]) / m1_c;
         }
@@ -172,13 +170,8 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
     for (int i = 0; i < NUM_LABELS; i++){
       for (int j = 0; j < NUM_FEATURES; j++){
         float std = std_dev[i][j]; // 1 / sigma
-        float std2 = (std)*(std);  // 1 / sigma^2
         float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
-        // float mn = mean[i][j];
-        // float exp_term = exp( -( (mn)*(mn)*std2*0.5 ) );
         float mean_prob = (first_term);
-
-        // first_term = 0.3989423 * std; // 1 / rad(2pisigma^2
         float exp_term = exp( -( 0.5 ) );
         float std_prob = (exp_term) * (first_term);
       
@@ -203,21 +196,15 @@ bit2_t gnb_predict( feature_type X[4] ){
   
   PREDICT_LOOP: for(int i = 0; i < NUM_LABELS; i++){
     float gnb_prior = prior[i];
-    //float smooth = 1.0;
+
     for(int j = 0; j < NUM_FEATURES; j++){
-                                          
-      // float std = std_dev[i][j]; // 1 / sigma
-      // float std2 = (std)*(std);  // 1 / sigma^2
-      // float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
       float mn = mean[i][j];
       float x = X[j];
-      // float exp_term = exp( -( (x-mn)*(x-mn)*std2*0.5 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
-      // gnb_prior *= (exp_term) * (first_term);
       float yval = slope[i][j] * ABS((mn-x)) + yint[i][j];
       if (yval > 0){
         gnb_prior *= yval;
       } else {
-        gnb_prior *= 0.00001; //Something small
+        gnb_prior *= 0.01; //Something small
       }
       
     }
