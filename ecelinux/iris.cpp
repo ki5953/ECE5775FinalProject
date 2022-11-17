@@ -174,16 +174,16 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
         float std = std_dev[i][j]; // 1 / sigma
         float std2 = (std)*(std);  // 1 / sigma^2
         float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
-        float mn = mean[i][j];
-        float exp_term = exp( -( (mn)*(mn)*std2*0.5 ) );
-        float mean_prob = (exp_term) * (first_term);
+        // float mn = mean[i][j];
+        // float exp_term = exp( -( (mn)*(mn)*std2*0.5 ) );
+        float mean_prob = (first_term);
 
         first_term = 0.3989423 * std; // 1 / rad(2pisigma^2
         exp_term = exp( -( 0.5 ) );
         float std_prob = (exp_term) * (first_term);
       
-        slope[i][j] = (mean_prob - std_prob) * (std);// (ym - ystd) / (xm-xstd)
-        yint[i][j] = mean_prob - (slope[i][j] * mn);
+        slope[i][j] = (std_prob - mean_prob) * (std);// (ym - ystd) / (xm-xstd)
+        yint[i][j] = mean_prob; //- (slope[i][j] * mn);
       }
     }
 }
