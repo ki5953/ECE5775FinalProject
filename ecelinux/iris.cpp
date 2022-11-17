@@ -160,7 +160,7 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
     }
     for (int i = 0; i < NUM_LABELS; i++){
       for (int j = 0; j < NUM_FEATURES; j++){
-        std_dev[i][j]= sqrt(std_dev[i][j]); 
+        std_dev[i][j]= 1 / sqrt(std_dev[i][j]); // make inverse for calculations
       }
     }
 }
@@ -183,12 +183,12 @@ bit2_t gnb_predict( feature_type X[4] ){
     //float smooth = 1.0;
     for(int j = 0; j < NUM_FEATURES; j++){
                                           
-      float std = std_dev[i][j];
-      float std_2_2 = (std)*(std)*2;
-      float first_term = sqrt(3.14159265358979*std_2_2); 
+      float std = std_dev[i][j]; // 1 / sigma
+      float std2 = (std)*(std);  // 1 / sigma^2
+      float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
       float mn = mean[i][j];
       float x = X[j];
-      float exp_term = exp( -( (x-mn)*(x-mn) / std_2_2 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
+      float exp_term = exp( -( (x-mn)*(x-mn)*std2*0.5 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
       // float base_x = -( (X[j]-mn)*(X[j]-mn) / std_2_2 );
       // float exp_term_2;
       // float clamp_val = 1.263 * sqrt(std);
@@ -201,7 +201,7 @@ bit2_t gnb_predict( feature_type X[4] ){
       // }
 
       // printf("OG Exp Term: %f, New Exp: %f\n", exp_term, exp_term_2);
-      gnb_prior *= (exp_term) / (first_term);
+      gnb_prior *= (exp_term) * (first_term);
       
     }
     if(gnb_prior > labelprob){
