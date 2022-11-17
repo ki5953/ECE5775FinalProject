@@ -15,6 +15,8 @@ using namespace std;
 float mean[NUM_LABELS][NUM_FEATURES];
 float std_dev[NUM_LABELS][NUM_FEATURES];
 float prior[NUM_LABELS];
+float slope[NUM_LABELS][NUM_FEATURES];
+float yint[NUM_LABELS][NUM_FEATURES];
 
 //----------------------------------------------------------
 // Top function
@@ -163,6 +165,25 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
         std_dev[i][j]= 1 / sqrt(std_dev[i][j]); // make inverse for calculations
       }
     }
+
+    // calculate triangle
+    for (int i = 0; i < NUM_LABELS; i++){
+      for (int j = 0; j < NUM_FEATURES; j++){
+        float std = std_dev[i][j]; // 1 / sigma
+        float std2 = (std)*(std);  // 1 / sigma^2
+        float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
+        float mn = mean[i][j];
+        float exp_term = exp( -( (mn)*(mn)*std2*0.5 ) );
+        float mean_prob = (exp_term) * (first_term);
+
+        first_term = 0.3989423 * std; // 1 / rad(2pisigma^2
+        exp_term = exp( -( 0.5 ) );
+        float std_prob = (exp_term) * (first_term);
+      
+        slope[i][j] = (mean_prob - std_prob) * (std);// (ym - ystd) / (xm-xstd)
+        yint[i][j] = mean_prob - (slope[i][j] * mn);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------
@@ -183,25 +204,19 @@ bit2_t gnb_predict( feature_type X[4] ){
     //float smooth = 1.0;
     for(int j = 0; j < NUM_FEATURES; j++){
                                           
-      float std = std_dev[i][j]; // 1 / sigma
-      float std2 = (std)*(std);  // 1 / sigma^2
-      float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
+      // float std = std_dev[i][j]; // 1 / sigma
+      // float std2 = (std)*(std);  // 1 / sigma^2
+      // float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
       float mn = mean[i][j];
       float x = X[j];
-      float exp_term = exp( -( (x-mn)*(x-mn)*std2*0.5 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
-      // float base_x = -( (X[j]-mn)*(X[j]-mn) / std_2_2 );
-      // float exp_term_2;
-      // float clamp_val = 1.263 * sqrt(std);
-      // if (base_x > clamp_val || base_x < -clamp_val) exp_term_2 = 0; //clamping
-      // else {
-      //   float x_2 = base_x * base_x;
-      //   float x_3 = x_2 * base_x;
-      //   float x_4 = x_3 * base_x;
-      //   exp_term_2 = 1 + base_x + x_2/2 + x_3/6 + x_4/24;
-      // }
-
-      // printf("OG Exp Term: %f, New Exp: %f\n", exp_term, exp_term_2);
-      gnb_prior *= (exp_term) * (first_term);
+      // float exp_term = exp( -( (x-mn)*(x-mn)*std2*0.5 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
+      // gnb_prior *= (exp_term) * (first_term);
+      float yval = slope[i][j] * abs(mn-x) + yint[i][j];
+      if (yval > 0){
+        gnb_prior *= yval;
+      } else {
+        gnb_prior *= 0.00001; //Something small
+      }
       
     }
     if(gnb_prior > labelprob){
