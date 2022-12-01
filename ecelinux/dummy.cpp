@@ -1,6 +1,7 @@
 //==========================================================================
-// iris.cpp
+// dummy.cpp
 //==========================================================================
+// dummy program for timing stream in and stream out
 
 #include "iris.h"
 
@@ -49,15 +50,17 @@ void dut(
       input3.ival = strm_in.read();
       input4.ival = strm_in.read();
       
-      test_iris[i][0] = input1.fval;
-      test_iris[i][1] = input2.fval;
-      test_iris[i][2] = input3.fval;
-      test_iris[i][3] = input4.fval;
+      // test_iris[i][0] = input1.fval;
+      // test_iris[i][1] = input2.fval;
+      // test_iris[i][2] = input3.fval;
+      // test_iris[i][3] = input4.fval;
 
       // ------------------------------------------------------
       // Call IRIS
       // ------------------------------------------------------
-      bit2_t prediction = gnb_predict (test_iris[i]);
+      // bit2_t prediction = gnb_predict (test_iris[i]);
+      bit2_t prediction = 0;
+
       
       // ------------------------------------------------------
       // Output processing

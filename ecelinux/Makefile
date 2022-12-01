@@ -37,6 +37,11 @@ fixed_bitstream:
 	vivado_hls -f run_fixed.tcl
 	./run_bitstream.sh iris_fixed_2decbits
 
+dummy_bitstream:
+	@echo "Synthesizing dummy and creating bitstream on amdpool ..."
+	vivado_hls -f run_dummy.tcl
+	./run_bitstream.sh iris_dummy
+
 clean:
 	rm -rf iris *.dat *.prj *.log
 	rm -rf zedboard_project* xillydemo.bit
