@@ -172,7 +172,7 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
         float std = std_dev[i][j]; // 1 / sigma
         float first_term = 0.3989423 * std; // 1 / rad(2pisigma^2)
         float mean_prob = (first_term);
-        float exp_term = exp( -( 0.5 ) );
+        float exp_term = 0.60653;
         float std_prob = (exp_term) * (first_term);
       
         slope[i][j] = (std_prob - mean_prob) * (std);// (ym - ystd) / (xm-xstd)
@@ -197,14 +197,16 @@ bit2_t gnb_predict( feature_type X[4] ){
   PREDICT_LOOP: for(int i = 0; i < NUM_LABELS; i++){
     float gnb_prior = prior[i];
 
-    for(int j = 0; j < NUM_FEATURES; j++){
+    INNER_PREDICT_LOOP: for(int j = 0; j < NUM_FEATURES; j++){
       float mn = mean[i][j];
       float x = X[j];
       float yval = slope[i][j] * ABS((mn-x)) + yint[i][j];
       if (yval > 0){
         gnb_prior *= yval;
+
       } else {
         gnb_prior *= 0.01; //Something small
+
       }
       
     }
