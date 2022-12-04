@@ -1,5 +1,5 @@
 # Iris Flower Classification Using Gaussian Naive Bayes
-# GitHub link: https://github.com/ki5953/ECE5775FinalProject/tree/gaussian_opt
+#### GitHub link: https://github.com/ki5953/ECE5775FinalProject/tree/gaussian_opt
 
 ## Run on ecelinux
 * ```cd ECE5775FinalProject/ecelinux```
