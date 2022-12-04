@@ -4,10 +4,7 @@
 # @brief: A Tcl script for synthesizing the float baseline iris recognition design.
 
 # Project name
-# set hls_prj iris_float_nopragma.prj
-# set hls_prj iris_float_nopragma.prj
-# set hls_prj iris_float_midpragma.prj
-set hls_prj iris_float_allpragma.prj
+set hls_prj iris_float.prj
 
 
 # Open/reset the project

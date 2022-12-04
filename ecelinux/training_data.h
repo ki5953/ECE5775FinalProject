@@ -26,16 +26,5 @@ const bit2_t trn_label[TRAIN_SIZE] = {
     #include "data_iris/training_iris_labels.dat" 
 };
 
-// const feature_type testing_data[TEST_SIZE] = {
-//     {
-//     #include "data_iris/testing_iris.dat" 
-//     },
-// }; 
-
-// const bit2_t testing_data_labels[TEST_SIZE] = {
-//     {
-//     #include "data_iris/testing_iris_labels.dat" 
-//     },
-// };
 
 #endif

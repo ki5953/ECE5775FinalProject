@@ -21,8 +21,6 @@ csim: iris.cpp iris_test.cpp
 	g++ ${CFLAGS} $^ -o iris -lrt
 	./iris
 
-fixed_vivado:
-	vivado_hls -f run_fixed.tcl
 
 float_vivado:
 	vivado_hls -f run_float.tcl
@@ -31,11 +29,6 @@ float_bitstream:
 	@echo "Synthesizing iris and creating bitstream on amdpool ..."
 	vivado_hls -f run_float.tcl
 	./run_bitstream.sh iris_float_nopragma
-
-fixed_bitstream: 
-	@echo "Synthesizing iris and creating bitstream on amdpool ..."
-	vivado_hls -f run_fixed.tcl
-	./run_bitstream.sh iris_fixed_2decbits
 
 clean:
 	rm -rf iris *.dat *.prj *.log

@@ -88,22 +88,6 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
     // features is the training set where each row is a sample and each column is a feature.
     // labels are the training labels which correspond to each row of "features"
     bit2_t output_labels[3] = {0,1,2}; //all possible outputs in the training se
-    // NUM_LABELS = output_size = 3 // the number of all possible outputs
-    
-    // mean = np.zeros((output_size, X.shape[1])) # a m by n matrix where m is the number of outputs, 
-    //                                         # and n is the number of features
-    //                                         # mean[i,j] is the mean for feature j for samples whose output is i.
-    // std = np.zeros((output_size, X.shape[1])) # a m by n matrix where m is the number of outputs, 
-    //                                         # and n is the number of features
-    //                                         # std[i,j] is the standard deviation for feature j for samples whose output is i.
-    // ======= Your Code Starts Here =======
-    // for label in y:
-    //     if(label == output_labels[0]):
-    //         prior[0] += 1
-    //     elif(label == output_labels[1]):
-    //         prior[1] += 1
-    //     elif(label == output_labels[2]):
-    //         prior[2] += 1
 
     //Zero out arrays
     for(int i = 0; i < NUM_LABELS; i++){
@@ -144,8 +128,6 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
     }
 
     //Accrue Std dev
-    // for sample in range(X.shape[0]):
-    //     for feature in range(X.shape[1]):
     for (int i = 0; i < TRAIN_SIZE; i++){
       for (int j = 0; j < NUM_FEATURES; j++){
         // Check each standard deviation
@@ -175,8 +157,8 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
         float exp_term = 0.60653;
         float std_prob = (exp_term) * (first_term);
       
-        slope[i][j] = (std_prob - mean_prob) * (std);// (ym - ystd) / (xm-xstd)
-        yint[i][j] = mean_prob; //- (slope[i][j] * mn);
+        slope[i][j] = (std_prob - mean_prob) * (std);
+        yint[i][j] = mean_prob;
       }
     }
 }
