@@ -1,7 +1,7 @@
 //=========================================================================
 // testbench.cpp
 //=========================================================================
-// @brief: testbench for k-nearest-neighbor digit recongnition application
+// @brief: testbench for iris GNB recongnition application
 
 #include <stdio.h>
 #include <iostream>
@@ -50,19 +50,13 @@ int main()
   std::string line_feature;
   std::string line_label;
   std::ifstream myfeatures ("data_iris/testing_iris.dat");
-  // std::ifstream mylabels ("data_iris/testing_iris_labels.dat");
   
   // HLS streams for communicating with the iris block
   hls::stream<bit32_t> iris_in;
   hls::stream<bit32_t> iris_out;
-  //hls::stream<bit8_t>  train_flag;
 
   // Number of test instances
   const int N = TEST_SIZE;
-  
-  // Arrays to store test data and expected results
-  // feature_type inputs[N][NUM_FEATURES];
-  // int   expecteds[N];
 
   feature_type inputs[N][NUM_FEATURES] = {
     #include "data_iris/testing_iris.dat"
@@ -82,32 +76,6 @@ int main()
 
 
   if ( outfile.is_open() ) {
-
-    //-------------------------------------------------------------------------------
-    // Read data from the input files into test feature array and test label array
-    //-------------------------------------------------------------------------------
-    // for (int i = 0; i < N; ++i) {
-      // assert( std::getline( myfeatures, line_feature) );
-      // assert( std::getline( mylabels, line_label) );
-
-      // Read feature input
-
-      // int start_pos = 0;
-      // for(int f = 0; f < NUM_FEATURES; f++) { //Splits feature string into 4 float values, based on comma positions
-      //   int comma_pos = line_feature.find(",", start_pos);
-      //   inputs[i][f] = float2feature_type(stof(line_feature.substr(start_pos, comma_pos-start_pos))); //TODO: ADD feature type conversion
-      //   start_pos = comma_pos+1;
-      // }
-      
-      //Read test input
-      // expecteds[i] = stoi(line_label.substr(0,1)); //Ignores comma character
-      // expecteds[i] = strt(line_label.substr(0,1)); //Ignores comma character
-
-
-      // Store the digits into arrays
-      // inputs[i] = input_digit;
-
-    // }
 
     //-------------------------------------------------------------------------------
     // Training Model
@@ -175,8 +143,6 @@ int main()
     
     // Close input file for the testing set
     outfile.close();
-    // delete &train_timer;
-    // delete &test_timer;
     
   }
   else std::cout << "Unable to open file for the testing set!" << std::endl; 

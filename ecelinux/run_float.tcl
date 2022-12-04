@@ -4,8 +4,7 @@
 # @brief: A Tcl script for synthesizing the float baseline iris recognition design.
 
 # Project name
-set hls_prj iris_float_nopragma.prj
-# set hls_prj iris_float.prj
+set hls_prj iris_float.prj
 
 # Open/reset the project
 open_project ${hls_prj} -reset
@@ -27,11 +26,11 @@ create_clock -period 10
 
 ### You can insert your own directives here ###
 # set_directive_pipeline gnb_predict/PREDICT_LOOP
-#set_directive_pipeline dut/TEST_LOOP
-# set_directive_array_partition gnb_predict std_dev -dim 0
+set_directive_pipeline dut/TEST_LOOP
+set_directive_array_partition gnb_predict std_dev -dim 0
 set_directive_array_partition gnb_predict prior -dim 0
-# set_directive_array_partition gnb_predict mean -dim 0
-# set_directive_array_partition gnb_predict X -dim 0
+set_directive_array_partition gnb_predict mean -dim 0
+set_directive_array_partition gnb_predict X -dim 0
 
 
 ############################################

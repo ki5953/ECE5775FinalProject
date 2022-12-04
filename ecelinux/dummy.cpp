@@ -49,19 +49,12 @@ void dut(
       input2.ival = strm_in.read();
       input3.ival = strm_in.read();
       input4.ival = strm_in.read();
-      
-      // test_iris[i][0] = input1.fval;
-      // test_iris[i][1] = input2.fval;
-      // test_iris[i][2] = input3.fval;
-      // test_iris[i][3] = input4.fval;
 
       // ------------------------------------------------------
       // Call IRIS
       // ------------------------------------------------------
-      // bit2_t prediction = gnb_predict (test_iris[i]);
       bit2_t prediction = 0;
 
-      
       // ------------------------------------------------------
       // Output processing
       // ------------------------------------------------------
@@ -86,22 +79,6 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
     // features is the training set where each row is a sample and each column is a feature.
     // labels are the training labels which correspond to each row of "features"
     bit2_t output_labels[3] = {0,1,2}; //all possible outputs in the training se
-    // NUM_LABELS = output_size = 3 // the number of all possible outputs
-    
-    // mean = np.zeros((output_size, X.shape[1])) # a m by n matrix where m is the number of outputs, 
-    //                                         # and n is the number of features
-    //                                         # mean[i,j] is the mean for feature j for samples whose output is i.
-    // std = np.zeros((output_size, X.shape[1])) # a m by n matrix where m is the number of outputs, 
-    //                                         # and n is the number of features
-    //                                         # std[i,j] is the standard deviation for feature j for samples whose output is i.
-    // ======= Your Code Starts Here =======
-    // for label in y:
-    //     if(label == output_labels[0]):
-    //         prior[0] += 1
-    //     elif(label == output_labels[1]):
-    //         prior[1] += 1
-    //     elif(label == output_labels[2]):
-    //         prior[2] += 1
 
     //Zero out arrays
     for(int i = 0; i < NUM_LABELS; i++){
@@ -129,7 +106,6 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
       for (int j = 0; j < NUM_FEATURES; j++){
         //Check to see what the label is for this attribute, and add to corresponding index of mean array
         //Need to accrue means for each attribute, for each type of flower.
-        //print(y[sample])
         if(labels[i] == output_labels[0]){
           mean[0][j] += features[i][j] / m1_c;
         }
@@ -143,12 +119,9 @@ void gnb_train( const float features[TRAIN_SIZE][4], const bit2_t labels[TRAIN_S
     }
 
     //Accrue Std dev
-    // for sample in range(X.shape[0]):
-    //     for feature in range(X.shape[1]):
     for (int i = 0; i < TRAIN_SIZE; i++){
       for (int j = 0; j < NUM_FEATURES; j++){
         // Check each standard deviation
-        // print(y[sample])
         if(labels[i] == output_labels[0]){
           std_dev[0][j] += (features[i][j]-mean[0][j])*(features[i][j]-mean[0][j]) / m1_c;
         }
@@ -190,19 +163,8 @@ bit2_t gnb_predict( feature_type X[4] ){
       float first_term = sqrt(3.14159265358979*std_2_2); 
       float mn = mean[i][j];
       float x = X[j];
-      float exp_term = exp( -( (x-mn)*(x-mn) / std_2_2 ) ); // 1 + x + x^2/2 + x^3/6 + x^4/24
-      // float base_x = -( (X[j]-mn)*(X[j]-mn) / std_2_2 );
-      // float exp_term_2;
-      // float clamp_val = 1.263 * sqrt(std);
-      // if (base_x > clamp_val || base_x < -clamp_val) exp_term_2 = 0; //clamping
-      // else {
-      //   float x_2 = base_x * base_x;
-      //   float x_3 = x_2 * base_x;
-      //   float x_4 = x_3 * base_x;
-      //   exp_term_2 = 1 + base_x + x_2/2 + x_3/6 + x_4/24;
-      // }
+      float exp_term = exp( -( (x-mn)*(x-mn) / std_2_2 ) );
 
-      // printf("OG Exp Term: %f, New Exp: %f\n", exp_term, exp_term_2);
       gnb_prior *= (exp_term) / (first_term);
       
     }
